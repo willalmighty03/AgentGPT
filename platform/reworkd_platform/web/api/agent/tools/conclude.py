@@ -4,7 +4,7 @@ from reworkd_platform.web.api.agent.tools.tool import Tool
 
 class Conclude(Tool):
     description = (
-        "Use when there is nothing else to do.:"
+        "Use when there is nothing else to do.\n"
         "The task is finished or has already been completed."
     )
 

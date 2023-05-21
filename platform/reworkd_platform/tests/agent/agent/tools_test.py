@@ -17,9 +17,10 @@ def test_get_tools_overview() -> None:
     """Simple test to assert that the wikipedia description is what we expect."""
     overview = get_tools_overview()
     wikipedia_description = (
-        "Search Wikipedia for information about historical people, companies, events, "
-        "places or research. This should be used over search for broad overviews of "
-        "specific nouns.\n The argument should be a simple query of just the noun."
+        "Queries Wikipedia for comprehensive insights into specific topics "
+        "such as historical entities, corporate bodies, events, "
+        "or locations. Argument: Concise, noun-focused query. Less "
+        "suitable for real-time queries."
     )
 
     assert wikipedia_description in overview

@@ -7,9 +7,10 @@ from reworkd_platform.web.api.agent.tools.utils import summarize
 
 class Wikipedia(Tool):
     description = (
-        "Search Wikipedia for information about historical people, companies, events, "
-        "places or research. This should be used over search for broad overviews of "
-        "specific nouns.\n The argument should be a simple query of just the noun."
+        "Queries Wikipedia for comprehensive insights into specific topics "
+        "such as historical entities, corporate bodies, events, "
+        "or locations. Argument: Concise, noun-focused query. Less "
+        "suitable for real-time queries."
     )
     public_description = "Search Wikipedia for historical information."
 
