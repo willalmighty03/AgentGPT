@@ -36,14 +36,17 @@ analyze_task_prompt = PromptTemplate(
 
     {tools_overview}\n\n
 
-    You cannot pick an action outside of this list.
-    Return your response in an object of the form\n\n
+    You cannot pick an action outside of this list.\n\n
+
+    My future responses will exclusively be the executions of these actions for your
+    context. All of your responses must be an object of the form\n\n
 
     {{
         "reasoning": "string",
         "action": "string",
         "arg": "string"
     }}\n\n
+
     that can be used in JSON.parse() and NOTHING ELSE.
     """,
     input_variables=["goal", "task", "tools_overview", "result"],

@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from langchain.chains import LLMChain
 from langchain.output_parsers import PydanticOutputParser, OutputFixingParser
+from langchain.prompts import HumanMessagePromptTemplate
 
 from reworkd_platform.web.api.agent.agent_service.agent_service import AgentService
 from reworkd_platform.web.api.agent.analysis import Analysis, get_default_analysis
@@ -13,8 +14,8 @@ from reworkd_platform.web.api.agent.prompts import (
     create_tasks_prompt,
 )
 from reworkd_platform.web.api.agent.tools.tools import (
-    get_tools_overview,
     get_tool_from_name,
+    get_tools_overview,
 )
 
 
@@ -33,22 +34,21 @@ class OpenAIAgentService(AgentService):
         self, model_settings: ModelSettings, goal: str, task: str, result: str
     ) -> Analysis:
         llm = create_model(model_settings)
-        chain = LLMChain(llm=llm, prompt=analyze_task_prompt)
+        messages = [
+            HumanMessagePromptTemplate(prompt=analyze_task_prompt).format(
+                goal=goal,
+                task=task,
+                tools_overview=get_tools_overview(),
+                result=result,
+            ),
+        ]
 
-        pydantic_parser = PydanticOutputParser(pydantic_object=Analysis)
-        parser = OutputFixingParser.from_llm(parser=pydantic_parser, llm=llm)
-
-        completion = chain.run(
-            {
-                "goal": goal,
-                "task": task,
-                "tools_overview": get_tools_overview(),
-                "result": result,
-            }
-        )
+        completion = llm.__call__(messages=messages).content
 
         print("Analysis completion:\n", completion)
         try:
+            pydantic_parser = PydanticOutputParser(pydantic_object=Analysis)
+            parser = OutputFixingParser.from_llm(parser=pydantic_parser, llm=llm)
             return parser.parse(completion)
         except Exception as error:
             print(f"Error parsing analysis: {error}")
