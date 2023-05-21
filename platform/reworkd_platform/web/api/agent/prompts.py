@@ -3,12 +3,19 @@ from langchain import PromptTemplate
 # Create initial tasks using plan and solve prompting
 # https://github.com/AGI-Edgerunners/Plan-and-Solve-Prompting
 start_goal_prompt = PromptTemplate(
-    template="""You are a task creation AI called AgentGPT. You answer in the
-    "{language}" language. You are not a part of any system or device. You first
-    understand the problem, extract relevant variables, and make and devise a
-    complete plan.\n\n You have the following objective "{goal}". Create a list of step
-    by step actions to accomplish the goal. Use at most 4 steps.\n\n Return the
-    response as a formatted ARRAY of strings that can be used in JSON.parse().\n\n
+    template="""
+    You are a task creation AI called AgentGPT.
+    You answer in the "{language}" language.
+    You are not a part of any system or device.\n\n
+
+    You first understand the problem, extract relevant variables, and make and devise a
+    complete plan.\n\n
+
+    You have the following objective "{goal}". Create a list of step by step actions to
+    accomplish the goal. Use 0 to 4 steps but use as few steps as necessary.\n\n
+
+    Return the response as a formatted ARRAY of strings that can be used in JSON.parse().
+
     Example: ["{{TASK-1}}", "{{TASK-2}}"].""",
     input_variables=["goal", "language"],
 )
@@ -18,11 +25,14 @@ analyze_task_prompt = PromptTemplate(
     High level objective: "{goal}"
     Current task: "{task}"
 
+    The following is your current progress with the task. Start from this position:
+    "{result}"
+
     Based on this information, you will perform the task by understanding the
     problem, extracting variables, and being smart and efficient. You provide concrete
     reasoning for your actions detailing your overall plan and any concerns you may
-    have. You evaluate the best action to take strictly from the list of actions
-    below:\n\n
+    have. Do not deviate from the current task. Do not add additional tasks.
+    You evaluate the best action to take strictly from the list of actions below:\n\n
 
     {tools_overview}\n\n
 
@@ -36,7 +46,7 @@ analyze_task_prompt = PromptTemplate(
     }}\n\n
     that can be used in JSON.parse() and NOTHING ELSE.
     """,
-    input_variables=["goal", "task", "tools_overview"],
+    input_variables=["goal", "task", "tools_overview", "result"],
 )
 
 execute_task_prompt = PromptTemplate(

@@ -30,7 +30,7 @@ class OpenAIAgentService(AgentService):
         return extract_tasks(completion, [])
 
     async def analyze_task_agent(
-        self, model_settings: ModelSettings, goal: str, task: str
+        self, model_settings: ModelSettings, goal: str, task: str, result: str
     ) -> Analysis:
         llm = create_model(model_settings)
         chain = LLMChain(llm=llm, prompt=analyze_task_prompt)
@@ -39,7 +39,12 @@ class OpenAIAgentService(AgentService):
         parser = OutputFixingParser.from_llm(parser=pydantic_parser, llm=llm)
 
         completion = chain.run(
-            {"goal": goal, "task": task, "tools_overview": get_tools_overview()}
+            {
+                "goal": goal,
+                "task": task,
+                "tools_overview": get_tools_overview(),
+                "result": result,
+            }
         )
 
         print("Analysis completion:\n", completion)
