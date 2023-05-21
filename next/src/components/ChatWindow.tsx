@@ -18,10 +18,9 @@ import {
   MESSAGE_TYPE_SYSTEM,
   MESSAGE_TYPE_THINKING,
   PAUSE_MODE,
-  TASK_STATUS_COMPLETED,
-  TASK_STATUS_EXECUTING,
-  TASK_STATUS_FINAL,
-  TASK_STATUS_STARTED,
+  TASK_COMPLETED,
+  TASK_CREATED,
+  TASK_EXECUTING,
 } from "../types/agentTypes";
 import clsx from "clsx";
 import { getMessageContainerStyle, getTaskStatusIcon } from "./utils/helpers";
@@ -127,7 +126,7 @@ const ChatWindow = ({
           <FaPlay className="animation-hide absolute left-1/2 top-1/2 text-lg md:text-3xl" />
         )}
         {messages.map((message, index) => {
-          if (getTaskStatus(message) === TASK_STATUS_EXECUTING) {
+          if (getTaskStatus(message) === TASK_EXECUTING) {
             return null;
           }
 
@@ -418,12 +417,10 @@ const getMessagePrefix = (message: Message) => {
     return "EMBARKING_ON_NEW_GOAL";
   } else if (message.type === MESSAGE_TYPE_THINKING) {
     return "THINKING";
-  } else if (getTaskStatus(message) === TASK_STATUS_STARTED) {
+  } else if (getTaskStatus(message) === TASK_CREATED) {
     return "TASK_ADDED";
-  } else if (getTaskStatus(message) === TASK_STATUS_COMPLETED) {
+  } else if (getTaskStatus(message) === TASK_COMPLETED) {
     return `Completing: ${message.value}`;
-  } else if (getTaskStatus(message) === TASK_STATUS_FINAL) {
-    return "NO_MORE_TASKS";
   }
   return "";
 };

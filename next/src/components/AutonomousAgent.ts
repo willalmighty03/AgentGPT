@@ -14,9 +14,9 @@ import {
   MESSAGE_TYPE_TASK,
   MESSAGE_TYPE_THINKING,
   PAUSE_MODE,
-  TASK_STATUS_COMPLETED,
-  TASK_STATUS_EXECUTING,
-  TASK_STATUS_STARTED,
+  TASK_COMPLETED,
+  TASK_CREATED,
+  TASK_EXECUTING,
 } from "../types/agentTypes";
 import { useMessageStore } from "../stores";
 import { translate } from "../utils/translations";
@@ -100,7 +100,7 @@ class AutonomousAgent {
         const task: Task = {
           taskId: v1().toString(),
           value,
-          status: TASK_STATUS_STARTED,
+          status: TASK_CREATED,
           type: MESSAGE_TYPE_TASK,
         };
         this.sendMessage(task);
@@ -139,7 +139,7 @@ class AutonomousAgent {
 
     // Start with first task
     const currentTask = this.getRemainingTasks()[0] as Task;
-    this.sendMessage({ ...currentTask, status: TASK_STATUS_EXECUTING });
+    this.sendMessage({ ...currentTask, status: TASK_EXECUTING });
 
     this.sendThinkingMessage();
 
@@ -155,7 +155,7 @@ class AutonomousAgent {
       this.sendMessage({
         ...currentTask,
         info: result,
-        status: TASK_STATUS_COMPLETED,
+        status: TASK_COMPLETED,
       });
 
       analyses.push(await this.$api.analyzeTask(currentTask.value, analyses, results));
@@ -169,7 +169,7 @@ class AutonomousAgent {
   }
 
   getRemainingTasks(): Task[] {
-    return useMessageStore.getState().tasks.filter((t: Task) => t.status === TASK_STATUS_STARTED);
+    return useMessageStore.getState().tasks.filter((t: Task) => t.status === TASK_CREATED);
   }
 
   private conditionalPause() {

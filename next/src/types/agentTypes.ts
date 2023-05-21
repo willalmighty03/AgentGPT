@@ -7,31 +7,18 @@ export const [
   MESSAGE_TYPE_TASK,
   MESSAGE_TYPE_ACTION,
   MESSAGE_TYPE_SYSTEM,
-] = [
-  "goal" as const,
-  "thinking" as const,
-  "task" as const,
-  "action" as const,
-  "system" as const,
-];
+] = ["goal" as const, "thinking" as const, "task" as const, "action" as const, "system" as const];
 
-export const [
-  TASK_STATUS_STARTED,
-  TASK_STATUS_EXECUTING,
-  TASK_STATUS_COMPLETED,
-  TASK_STATUS_FINAL,
-] = [
+export const [TASK_CREATED, TASK_EXECUTING, TASK_COMPLETED] = [
   "started" as const,
   "executing" as const,
   "completed" as const,
-  "final" as const,
 ];
 
 const TaskStatusSchema = z.union([
-  z.literal(TASK_STATUS_STARTED),
-  z.literal(TASK_STATUS_EXECUTING),
-  z.literal(TASK_STATUS_COMPLETED),
-  z.literal(TASK_STATUS_FINAL),
+  z.literal(TASK_CREATED),
+  z.literal(TASK_EXECUTING),
+  z.literal(TASK_COMPLETED),
   z.literal(""),
 ]);
 
@@ -68,10 +55,7 @@ export type Message = z.infer<typeof messageSchema>;
 
 /* Agent Type */
 // Agent Mode
-export const [AUTOMATIC_MODE, PAUSE_MODE] = [
-  "Automatic Mode" as const,
-  "Pause Mode" as const,
-];
+export const [AUTOMATIC_MODE, PAUSE_MODE] = ["Automatic Mode" as const, "Pause Mode" as const];
 export type AgentMode = typeof AUTOMATIC_MODE | typeof PAUSE_MODE;
 
 // Agent Playback Control
@@ -98,5 +82,5 @@ export const getTaskStatus = (value: unknown): string | undefined => {
 };
 
 export const isAction = (value: unknown): boolean => {
-  return isTask(value) && value.status === TASK_STATUS_COMPLETED;
+  return isTask(value) && value.status === TASK_COMPLETED;
 };

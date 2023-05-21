@@ -1,7 +1,7 @@
 import React from "react";
 import FadeIn from "./motions/FadeIn";
 import Expand from "./motions/expand";
-import { MESSAGE_TYPE_TASK, Task, TASK_STATUS_STARTED } from "../types/agentTypes";
+import { MESSAGE_TYPE_TASK, Task, TASK_CREATED } from "../types/agentTypes";
 import { getMessageContainerStyle, getTaskStatusIcon } from "./utils/helpers";
 import { useAgentStore, useMessageStore } from "../stores";
 import { FaListAlt, FaTimesCircle } from "react-icons/fa";
@@ -28,7 +28,7 @@ export const TaskWindow = ({ visibleOnMobile }: TaskWindowProps) => {
     addMessage({
       taskId: v1().toString(),
       value: customTask,
-      status: TASK_STATUS_STARTED,
+      status: TASK_CREATED,
       type: MESSAGE_TYPE_TASK,
     });
     setCustomTask("");

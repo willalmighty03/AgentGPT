@@ -2,18 +2,10 @@ import { createSelectors } from "./helpers";
 import type { StateCreator } from "zustand";
 import { create } from "zustand";
 import type { Message, Task } from "../types/agentTypes";
-import {
-  isTask,
-  TASK_STATUS_EXECUTING,
-  TASK_STATUS_COMPLETED,
-  TASK_STATUS_FINAL,
-} from "../types/agentTypes";
+import { isTask, TASK_COMPLETED, TASK_EXECUTING } from "../types/agentTypes";
 
 const isExistingTask = (message: Message): boolean =>
-  isTask(message) &&
-  (message.status === TASK_STATUS_EXECUTING ||
-    message.status === TASK_STATUS_COMPLETED ||
-    message.status === TASK_STATUS_FINAL);
+  isTask(message) && (message.status === TASK_EXECUTING || message.status === TASK_COMPLETED);
 
 const resetters: (() => void)[] = [];
 
@@ -27,12 +19,7 @@ interface MessageSlice {
   deleteTask: (taskId: string) => void;
 }
 
-const createMessageSlice: StateCreator<
-  MessageSlice & TaskSlice,
-  [],
-  [],
-  MessageSlice
-> = (set) => {
+const createMessageSlice: StateCreator<MessageSlice & TaskSlice, [], [], MessageSlice> = (set) => {
   resetters.push(() => set(initialMessageState));
   return {
     ...initialMessageState,
@@ -67,12 +54,7 @@ interface TaskSlice {
   updateTaskStatus: (updatedTask: Task) => void;
 }
 
-const createTaskSlice: StateCreator<
-  MessageSlice & TaskSlice,
-  [],
-  [],
-  TaskSlice
-> = (set) => {
+const createTaskSlice: StateCreator<MessageSlice & TaskSlice, [], [], TaskSlice> = (set) => {
   resetters.push(() => set(initialTaskState));
   return {
     ...initialTaskState,
@@ -111,5 +93,4 @@ export const useMessageStore = createSelectors(
   }))
 );
 
-export const resetAllMessageSlices = () =>
-  resetters.forEach((resetter) => resetter());
+export const resetAllMessageSlices = () => resetters.forEach((resetter) => resetter());
