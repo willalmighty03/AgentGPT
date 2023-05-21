@@ -24,9 +24,13 @@ class MockAgentService(AgentService):
         return ["Task 4"]
 
     async def analyze_task_agent(
-        self, model_settings: ModelSettings, goal: str, task: str
+        self, model_settings: ModelSettings, goal: str, task: str, result: str
     ) -> Analysis:
-        return Analysis(action="reason", arg="Mock analysis")
+        return Analysis(
+            reasoning="I should search the web for no good reason!",
+            action="search",
+            arg="Search...",
+        )
 
     async def execute_task_agent(
         self,

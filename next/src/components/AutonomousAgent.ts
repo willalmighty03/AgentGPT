@@ -16,10 +16,9 @@ import {
   PAUSE_MODE,
   TASK_STATUS_COMPLETED,
   TASK_STATUS_EXECUTING,
-  TASK_STATUS_FINAL,
   TASK_STATUS_STARTED,
 } from "../types/agentTypes";
-import { useAgentStore, useMessageStore } from "../stores";
+import { useMessageStore } from "../stores";
 import { translate } from "../utils/translations";
 import { AgentApi } from "../services/agent-api";
 
@@ -144,63 +143,24 @@ class AutonomousAgent {
 
     this.sendThinkingMessage();
 
-    // Default to reasoning
-    let analysis: Analysis = {
-      reasoning: "I'll just think about it...",
-      action: "reason",
-      arg: "",
-    };
+    // Analyze how to execute a task: Reason, web search, other tools...
+    let analysis = await this.$api.analyzeTask(currentTask.value);
+    this.sendAnalysisMessage(analysis);
 
-    // If enabled, analyze what tool to use
-    if (useAgentStore.getState().isWebSearchEnabled) {
-      // Analyze how to execute a task: Reason, web search, other tools...
-      analysis = await this.$api.analyzeTask(currentTask.value);
+    while (analysis.action != "conclude") {
+      const result = await this.$api.executeTask(currentTask.value, analysis);
+      this.sendMessage({
+        ...currentTask,
+        info: result,
+        status: TASK_STATUS_COMPLETED,
+      });
+
+      analysis = await this.$api.analyzeTask(currentTask.value, result);
       this.sendAnalysisMessage(analysis);
     }
 
-    const result = await this.$api.executeTask(currentTask.value, analysis);
-    this.sendMessage({
-      ...currentTask,
-      info: result,
-      status: TASK_STATUS_COMPLETED,
-    });
-
     this.completedTasks.push(currentTask.value || "");
 
-    // Wait before adding tasks
-    await new Promise((r) => setTimeout(r, TIMEOUT_LONG));
-    this.sendThinkingMessage();
-
-    // Add new tasks
-    try {
-      const newTasks = await this.$api.getAdditionalTasks(
-        {
-          current: currentTask.value,
-          remaining: this.getRemainingTasks().map((task) => task.value),
-          completed: this.completedTasks,
-        },
-        result
-      );
-      for (const value of newTasks) {
-        await new Promise((r) => setTimeout(r, TIMOUT_SHORT));
-        const task: Task = {
-          taskId: v1().toString(),
-          value,
-          status: TASK_STATUS_STARTED,
-          type: MESSAGE_TYPE_TASK,
-        };
-        this.sendMessage(task);
-      }
-
-      if (newTasks.length == 0) {
-        this.sendMessage({ ...currentTask, status: TASK_STATUS_FINAL });
-      }
-    } catch (e) {
-      console.log(e);
-      this.sendErrorMessage(translate("ERROR_ADDING_ADDITIONAL_TASKS", "errors"));
-
-      this.sendMessage({ ...currentTask, status: TASK_STATUS_FINAL });
-    }
     await this.loop();
   }
 
@@ -289,10 +249,13 @@ class AutonomousAgent {
     if (analysis.action == "image") {
       message = `🎨 Generating an image with prompt: "${analysis.arg}"...`;
     }
+    if (analysis.action == "conclude") {
+      message = `✅ Concluding...`;
+    }
 
     this.sendMessage({
       type: MESSAGE_TYPE_SYSTEM,
-      value: message,
+      value: `${analysis.reasoning}\n\n` + message,
     });
   }
 

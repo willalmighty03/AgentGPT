@@ -51,6 +51,7 @@ async def analyze_tasks(request_body: AgentRequestBody) -> Analysis:
             request_body.modelSettings,
             request_body.goal,
             request_body.task,
+            request_body.result,
         )
     except Exception as error:
         raise HTTPException(

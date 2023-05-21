@@ -399,7 +399,7 @@ const ChatMessage = ({ message }: { message: Message }) => {
         </>
       ) : (
         <>
-          <span>{t(message.value, { ns: "chat" })}</span>
+          <MarkdownRenderer>{t(message.value, { ns: "chat" })}</MarkdownRenderer>
           {
             // Link to the FAQ if it is a shutdown message
             message.type == MESSAGE_TYPE_SYSTEM &&
