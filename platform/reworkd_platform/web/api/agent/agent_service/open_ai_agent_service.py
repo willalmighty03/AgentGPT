@@ -3,6 +3,7 @@ from typing import List, Optional
 from langchain.chains import LLMChain
 from langchain.output_parsers import PydanticOutputParser, OutputFixingParser
 from langchain.prompts import HumanMessagePromptTemplate
+from langchain.schema import HumanMessage, AIMessage
 
 from reworkd_platform.web.api.agent.agent_service.agent_service import AgentService
 from reworkd_platform.web.api.agent.analysis import Analysis, get_default_analysis
@@ -31,7 +32,12 @@ class OpenAIAgentService(AgentService):
         return extract_tasks(completion, [])
 
     async def analyze_task_agent(
-        self, model_settings: ModelSettings, goal: str, task: str, result: str
+        self,
+        model_settings: ModelSettings,
+        goal: str,
+        task: str,
+        analyses: Optional[List[Analysis]],
+        results: Optional[List[str]],
     ) -> Analysis:
         llm = create_model(model_settings)
         messages = [
@@ -39,9 +45,13 @@ class OpenAIAgentService(AgentService):
                 goal=goal,
                 task=task,
                 tools_overview=get_tools_overview(),
-                result=result,
             ),
         ]
+
+        if analyses is not None and results is not None:
+            for analysis, result in zip(analyses, results):
+                messages.append(AIMessage(content=str(analysis)))
+                messages.append(HumanMessage(content=result))
 
         completion = llm.__call__(messages=messages).content
 

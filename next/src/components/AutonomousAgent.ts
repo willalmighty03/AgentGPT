@@ -144,18 +144,22 @@ class AutonomousAgent {
     this.sendThinkingMessage();
 
     // Analyze how to execute a task: Reason, web search, other tools...
-    let analysis = await this.$api.analyzeTask(currentTask.value);
+    const results: string[] = [];
+    const analyses = [await this.$api.analyzeTask(currentTask.value)];
+    let analysis = analyses[analyses.length - 1] as Analysis;
     this.sendAnalysisMessage(analysis);
 
     while (analysis.action != "conclude") {
       const result = await this.$api.executeTask(currentTask.value, analysis);
+      results.push(result);
       this.sendMessage({
         ...currentTask,
         info: result,
         status: TASK_STATUS_COMPLETED,
       });
 
-      analysis = await this.$api.analyzeTask(currentTask.value, result);
+      analyses.push(await this.$api.analyzeTask(currentTask.value, analyses, results));
+      analysis = analyses[analyses.length - 1] as Analysis;
       this.sendAnalysisMessage(analysis);
     }
 

@@ -35,10 +35,11 @@ export class AgentApi {
     ).newTasks;
   }
 
-  async analyzeTask(task: string, lastResult?: string): Promise<Analysis> {
+  async analyzeTask(task: string, analyses?: Analysis[], results?: string[]): Promise<Analysis> {
     return await this.post<Analysis>("api/agent/analyze", {
       task: task,
-      result: lastResult,
+      analyses: analyses,
+      results: results,
     });
   }
 

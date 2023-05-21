@@ -25,9 +25,6 @@ analyze_task_prompt = PromptTemplate(
     High level objective: "{goal}"
     Current task: "{task}"
 
-    The following is your current progress with the task. Start from this position:
-    "{result}"
-
     Based on this information, you will perform the task by understanding the
     problem, extracting variables, and being smart and efficient. You provide concrete
     reasoning for your actions detailing your overall plan and any concerns you may
@@ -49,7 +46,7 @@ analyze_task_prompt = PromptTemplate(
 
     that can be used in JSON.parse() and NOTHING ELSE.
     """,
-    input_variables=["goal", "task", "tools_overview", "result"],
+    input_variables=["goal", "task", "tools_overview"],
 )
 
 execute_task_prompt = PromptTemplate(

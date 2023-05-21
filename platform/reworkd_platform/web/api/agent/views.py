@@ -23,6 +23,8 @@ class AgentRequestBody(BaseModel):
     tasks: Optional[List[str]]
     lastTask: Optional[str]
     result: Optional[str]
+    analyses: Optional[List[Analysis]]
+    results: Optional[List[str]]
     completedTasks: Optional[List[str]]
 
 
@@ -51,7 +53,8 @@ async def analyze_tasks(request_body: AgentRequestBody) -> Analysis:
             request_body.modelSettings,
             request_body.goal,
             request_body.task,
-            request_body.result,
+            request_body.analyses,
+            request_body.results,
         )
     except Exception as error:
         raise HTTPException(
